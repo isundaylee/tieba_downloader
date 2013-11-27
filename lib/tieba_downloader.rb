@@ -89,7 +89,6 @@ EOS
 
 				path = File.join(cache_dir, Digest::MD5.hexdigest(url))
 				File.write(path, open(url).read) unless File.exists?(path)
-				puts path
 				File.open(path).read.encode('utf-8', 'gbk', undef: :replace, invalid: :replace, replace: '?')
 			end
 
