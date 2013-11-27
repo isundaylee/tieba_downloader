@@ -81,7 +81,7 @@ EOS
 			end
 
 			def self.read_url(url, cached = false)
-				return open(url).read.encode('utf-8', 'gbk') unless cached
+				return open(url).read.encode('utf-8', 'gbk', undef: :replace, invalid: :replace, replace: '?') unless cached
 
 				cache_dir = '/tmp/url_caches'
 
@@ -89,7 +89,8 @@ EOS
 
 				path = File.join(cache_dir, Digest::MD5.hexdigest(url))
 				File.write(path, open(url).read) unless File.exists?(path)
-				File.open(path).read.encode('utf-8', 'gbk')
+				puts path
+				File.open(path).read.encode('utf-8', 'gbk', undef: :replace, invalid: :replace, replace: '?')
 			end
 
 			def to_utf8(_string)
@@ -97,7 +98,7 @@ EOS
 			    if cd.confidence > 0.6
 			      _string.force_encoding(cd.encoding)
 			    end
-			    _string.encode!("utf-8", :undef => :replace, :replace => "?", :invalid => :replace)
+			    _string.encode!("utf-8", :undef => :replace, :invalid => :replace, :replace => "?")
 			    return _string
 			end
 	end
