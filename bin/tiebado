@@ -1,0 +1,8 @@
+#!/usr/bin/env ruby
+
+require 'tieba_downloader'
+
+id = ARGV[0].to_i
+path = ARGV[1]
+
+TiebaDownloader::Downloader.download(id, path, op_only: true, caching: true)
