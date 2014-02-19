@@ -35,11 +35,11 @@ module TiebaDownloader
 				if p == 1
 					base_node = Nokogiri::XML::Node.new('base', out_doc)
 					base_node['href'] = url
-					out_doc.at_css('head') << base_node 
+					out_doc.at_css('head') << base_node
 				end
 
-				doc.css('div.core > div.core_title_wrap').each { |c| out_doc.at_css('div.core') << c } if p == 1
-				doc.css('div.core > div.p_postlist').each { |c| out_doc.at_css('div.core') << c }
+				doc.css('div.left_section > div.core_title_wrap').each { |c| out_doc.at_css('div.left_section') << c } if p == 1
+				doc.css('div.left_section > div.p_postlist').each { |c| out_doc.at_css('div.left_section') << c }
 			end
 
 			IO.write(path, out_doc.to_s)
@@ -52,23 +52,23 @@ module TiebaDownloader
 			end
 
 			def self.get_page_num(doc)
-				doc.css('li.l_reply_num span.red').first.content.to_i
+				doc.css('li.l_reply_num span.red').last.content.to_i
 			end
 
 			def self.template()
 				html = <<EOS
 <html>
 	<head>
-		<style>header,footer,section,article,aside,nav,figure{display:block;margin:0;padding:0;border:0}</style><link rel="shortcut icon" href="http://static.tieba.baidu.com/tb/favicon.ico" /><link rel="canonical" href="http://tieba.baidu.com/p/2700295789"/>
-		<link rel="stylesheet" href="http://tb1.bdstatic.com/??tb/static-common/style/tb_ui_4bdeadcc.css,tb/static-common/style/tb_common_28aafcab.css" />
-		<link rel="stylesheet" href="http://tb1.bdstatic.com/??/tb/_/user_54cd1749.css,/tb/_/padstyle_93e3a02e.css,/tb/_/top_banner_f213977a.css,/tb/_/mobile_tip_8f903bd4.css,/tb/_/poptip_6f29b423.css,/tb/_/search_d0398cac.css,/tb/_/tope_092d64c2.css,/tb/_/comtrial_8f28f1d3.css,/tb/_/rich_f9159604.css,/tb/_/padstyle_nav_a9e5e732.css,/tb/_/nav_2aa281f3.css,/tb/_/tbnav_341679f0.css,/tb/_/imgLikeAction_1bcfe3e9.css,/tb/_/platform_skin_31d6cfe0.css,/tb/_/roll_number_f65729a2.css,/tb/_/cheerForGEFC_125cb565.css,/tb/_/platform_weal_c8f64fe7.css,/tb/_/platform_head_ad8d8d3c.css,/tb/_/navigation_b8c4492d.css,/tb/_/timeaxis_af743834.css,/tb/_/platform_gallery_e41b40cd.css,/tb/_/form_editor_6e1b12a9.css,/tb/_/star_head_78843316.css,/tb/_/pager_71519538.css,/tb/_/share_77e3e5d8.css,/tb/_/message_c781cea1.css,/tb/_/block_user_3741e120.css,/tb/_/admin_ec512558.css,/tb/_/toFrs_b2392e3f.css,/tb/_/threadInfo_0a70161a.css" />
-		<link rel="stylesheet" href="http://tb1.bdstatic.com/??/tb/_/favthread_20612eca.css,/tb/_/forumTitle_554ab95e.css,/tb/_/icons_d5da634a.css,/tb/_/url_check_370e11f8.css,/tb/_/yingyin_url_tip_type1_f6e6207b.css,/tb/_/yingyin_url_tip_type2_0a611e9d.css,/tb/_/prison_14befb45.css,/tb/_/posts_3ede6b69.css,/tb/_/bd_share_719f1f51.css,/tb/_/share_thread_7762ec34.css,/tb/_/repost_0d2fe80a.css,/tb/_/slide_show_f14bfedb.css,/tb/_/meizhi_slide_window_71fbf9d6.css,/tb/_/platforum_activity_thread_637c5c98.css,/tb/_/platforum_activity_repost_19d72ded.css,/tb/_/idisk_13215ff6.css,/tb/_/lzl_thread_forbidden_tip_b58a5cda.css,/tb/_/game_spread_thread_c3fdf46a.css,/tb/_/related_threads_inside_ff525d9c.css,/tb/_/forumListV3_6ca01c3e.css,/tb/_/card_e8514f4c.css,/tb/_/voice_df66233d.css,tb/static-encourage/component/meizhi_vote/meizhi_vote_1b996a32.css,/tb/_/fancard_8924e942.css,/tb/_/grade_b2030134.css,/tb/_/interaction_154d0bb2.css,/tb/_/user_visit_card_536aab1e.css,/tb/_/thread_forbidden_tip_30c4094f.css,/tb/_/editor_pic_meizhi_82dc9008.css,tb/static-postor/widget/meizhi_postor/meizhi_postor_419117c5.css" />
-		<link rel="stylesheet" href="http://tb1.bdstatic.com/??/tb/_/sign_mod_c7fd60d5.css,/tb/_/loginForm_d3a30496.css,/tb/_/initiative_for_score_8e8ef186.css,/tb/_/tb_region_c9856ac4.css,/tb/_/balv_f1e9dfd8.css,/tb/_/tb_spam_c1ea890e.css,/tb/_/fan_aside_6cd84a4d.css,/tb/_/platform_aside_switch_cfcf06f2.css,/tb/_/lecai_lottery_7c35820d.css,/tb/_/basket_lottery_1beeaf7c.css,/tb/_/lucky_lottery_48875540.css,/tb/_/history_game_778e5727.css,/tb/_/asidead_dadb72dc.css,/tb/_/comad_dfcc91c6.css,/tb/_/cpro_3f453949.css,/tb/_/notice_b458d27d.css,/tb/_/follower_abc5ca54.css,/tb/_/news_recommend_374a53ac.css,/tb/_/rank_63df50b8.css,/tb/_/top10_27beb804.css,/tb/_/rich_ueditor_448bd9e7.css,/tb/_/word_limit_881bfc9a.css,/tb/_/rich_poster_3eb7e12c.css,/tb/_/editor_40e0faa4.css,tb/static-postor/widget/simple_postor/simple_postor_fd47c7b9.css,/tb/_/go_top_f97f29b7.css,/tb/_/noAutoVideo_f8175432.css,/tb/_/follow_be775ecf.css,/tb/_/fantuan_floatlayer_fd910978.css,/tb/_/ten_years_5963a8ca.css" />
-		<link rel="stylesheet" href="http://tb1.bdstatic.com/??/tb/_/dl_bubble_93f19946.css,/tb/_/skin_ad_37a07fe6.css,/tb/_/game_couplet_pb_d3b8be49.css,/tb/_/v3_02bfab3e.css" />
+		<style>header,footer,section,article,aside,nav,figure{display:block;margin:0;padding:0;border:0;}</style><link rel="shortcut icon" href="http://static.tieba.baidu.com/tb/favicon.ico" /><link rel="canonical" href="http://tieba.baidu.com/p/2129409225?see_lz=1&pn=5"/>
+		<link rel="stylesheet" href="http://tb1.bdstatic.com/??tb/static-common/style/tb_ui_ee1a9df0.css,tb/static-common/style/tb_common_f7f918b.css" />
+		<link rel="stylesheet" href="http://tb1.bdstatic.com/??/tb/_/padstyle_f62f0e6.css,/tb/_/top_banner_f7efdfb.css,/tb/_/mobile_tip_a4032eb.css,/tb/_/poptip_f81e5f1.css,/tb/_/ban_d89ad8da.css,/tb/_/search_dialog_911a0201.css,/tb/_/search_bright_918d1a5c.css,/tb/_/tope_092d64c2.css,/tb/_/comtrial_7121884.css,/tb/_/bright_f8c7e6d.css,/tb/_/padstyle_nav_30529717.css,/tb/_/tbnav_bright_ad3efb41.css,/tb/_/pager_f776b365.css,/tb/_/share_77e3e5d8.css,/tb/_/message_c781cea1.css,/tb/_/block_user_3741e120.css,/tb/_/admin_f71194e.css,/tb/_/toFrs_b2392e3f.css,/tb/_/threadInfo_e162c651.css,/tb/_/favthread_782e9f2f.css,/tb/_/forumTitle_3794e854.css,/tb/_/user_head_d42abf21.css,/tb/_/card_4ba3bfd4.css,/tb/_/user_a96c1845.css,/tb/_/icons_7843c0a9.css,/tb/_/url_check_370e11f8.css,/tb/_/yingyin_url_tip_type1_f6e6207b.css,/tb/_/yingyin_url_tip_type2_0a611e9d.css,/tb/_/prison_14befb45.css,/tb/_/js_pager_baf8f687.css" />
+		<link rel="stylesheet" href="http://tb1.bdstatic.com/??/tb/_/props_api_a7ddce6.css,/tb/_/residual_38d9843.css,/tb/_/posts_0b0751ff.css,/tb/_/bd_share_25899ff.css,/tb/_/share_thread_32d2da62.css,/tb/_/repost_2b418149.css,/tb/_/slide_show_f14bfedb.css,/tb/_/meizhi_slide_window_5731905d.css,/tb/_/platforum_activity_thread_dd92de05.css,/tb/_/pic_act_wall_d703167b.css,/tb/_/follower_abc5ca54.css,/tb/_/pic_act_poster_17dd50f8.css,/tb/_/platform_pic_act_thread_6f036f39.css,/tb/_/platforum_activity_repost_af3ca96e.css,/tb/_/idisk_6936707f.css,/tb/_/lzl_thread_forbidden_tip_b58a5cda.css,/tb/_/related_threads_inside_d4f303de.css,/tb/_/game_spread_thread_76cb4f06.css,/tb/_/inner_game_300b398c.css,/tb/_/forumListV3_8b3f1a20.css,/tb/_/voice_8653784c.css,/tb/_/meizhi_vote_39648ab.css,/tb/_/fancard_7279a9d4.css,/tb/_/interaction_892ea52.css,/tb/_/grade_1d9b075c.css,/tb/_/user_visit_card_a371894.css,/tb/_/thread_forbidden_tip_4d62bc1.css,/tb/_/editor_pic_meizhi_bff1e29a.css,tb/static-postor/widget/meizhi_postor/meizhi_postor_859f9109.css,/tb/_/rich_rank_5615444.css" />
+		<link rel="stylesheet" href="http://tb1.bdstatic.com/??/tb/_/sign_mod_ce0d4a67.css,/tb/_/sign_mod_bright_c7089f7c.css,/tb/_/loginForm_6d19387.css,/tb/_/initiative_for_score_1f7fe9e4.css,/tb/_/card_e0fc02eb.css,/tb/_/like_tip_adc12c53.css,/tb/_/tb_region_eecb81b.css,/tb/_/tb_spam_c1ea890e.css,/tb/_/balv_f678d46d.css,/tb/_/fan_aside_29d4fb0b.css,/tb/_/platform_aside_switch_8d3dee9.css,/tb/_/basket_lottery_ea3d29b.css,/tb/_/lecai_lottery_676a6e3.css,/tb/_/ssq_lottery_50349a8.css,/tb/_/lucky_lottery_5af2308.css,/tb/_/lottery_wrapper_2e8df4e.css,/tb/_/history_game_2ef120a.css,/tb/_/asidead_3698bf1.css,/tb/_/cpro_9b96a187.css,/tb/_/notice_ee5304b1.css,/tb/_/news_recommend_2a1306b.css,/tb/_/rank_82fe17f.css,/tb/_/top10_27beb804.css,/tb/_/thread_footer_d93a042.css,/tb/_/rich_ueditor_9cd614da.css,/tb/_/word_limit_881bfc9a.css,/tb/_/like_tip_adc12c53.css,/tb/_/rich_poster_6f2f28e5.css,/tb/_/editor_40e0faa4.css,tb/static-postor/widget/simple_postor/simple_postor_fd47c7b9.css" />
+		<link rel="stylesheet" href="http://tb1.bdstatic.com/??/tb/_/go_top_5ea1332.css,/tb/_/music_player_9552453b.css,/tb/_/noAutoVideo_6fd37ce.css,/tb/_/follow_be775ecf.css,/tb/_/nav_2aa281f3.css,/tb/_/skin_ad_8d47d76.css,/tb/_/dl_bubble_93f19946.css,/tb/_/magic_props_8fc3773.css,/tb/_/guide_11ff562.css,/tb/_/feedback_16ef2cf.css,/tb/_/guide_login_register_41d0822.css,/tb/_/tablegame_ca7578f.css,/tb/_/bright_9273507.css" />
 	</head>
 
 	<body>
-		<div class="core" style="margin: 0 auto; ">
+		<div class="left_section" style="float: none; margin: 0 auto; ">
 		</div>
 	</body>
 </html>
