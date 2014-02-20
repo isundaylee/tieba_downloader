@@ -28,7 +28,7 @@ module TiebaDownloader
 			out_doc = template
 
 			1.upto(pn) do |p|
-				puts "正在下载第 %03d / %03d 页" % [p, pn]
+				puts "正在下载页面 (%03d / %03d)" % [p, pn]
 				url = page_url(id, p, op_only)
 				doc = Nokogiri::HTML(read_url(url, caching)) unless p == 1
 
@@ -42,10 +42,37 @@ module TiebaDownloader
 				doc.css('div.left_section > div.p_postlist').each { |c| out_doc.at_css('div.left_section') << c }
 			end
 
+			embed_css(out_doc)
+
 			IO.write(path, out_doc.to_s)
 		end
 
 		private
+
+			def self.embed_css(doc)
+				count = 0
+				all = 0
+
+				doc.css('link').each do |s|
+					next unless s['rel'] == 'stylesheet'
+					all += 1
+				end
+
+				doc.css('link').each do |s|
+					next unless s['rel'] == 'stylesheet'
+
+					count += 1
+					puts "正在下载样式 (%03d / %03d)" % [count, all]
+
+					css = read_url(s['href'], true)
+
+					node = Nokogiri::XML::Node.new 'style', doc
+					node.content = css
+					s.add_next_sibling(node)
+
+					s.remove
+				end
+			end
 
 			def self.page_url(id, page, op_only)
 				"http://tieba.baidu.com/p/#{id}?pn=#{page}&see_lz=#{op_only ? 1 : 0}"
