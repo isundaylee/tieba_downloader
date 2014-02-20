@@ -8,6 +8,7 @@ module TiebaDownloader
 	require 'nokogiri'
 	require 'fileutils'
 	require 'digest/md5'
+	require 'base64'
 
 	class Downloader
 
@@ -43,6 +44,7 @@ module TiebaDownloader
 			end
 
 			embed_css(out_doc)
+			embed_img(out_doc, page_url(id, 1, op_only))
 
 			IO.write(path, out_doc.to_s)
 		end
@@ -71,6 +73,25 @@ module TiebaDownloader
 					s.add_next_sibling(node)
 
 					s.remove
+				end
+			end
+
+			def self.embed_img(doc, base)
+				count = 0
+				all = doc.css('img').size
+
+				doc.css('img').each do |i|
+					count += 1
+
+					puts "正在下载图片 (%03d / %03d)" % [count, all]
+
+					url = i['src']
+					url = URI::join(base, url).to_s unless url.start_with? 'http'
+
+					image = read_url(url, true, true)
+					string = 'data:image/png;base64,' + Base64.strict_encode64(image).strip
+
+					i['src'] = string
 				end
 			end
 
@@ -107,8 +128,8 @@ EOS
 				html
 			end
 
-			def self.read_url(url, cached = false)
-				return open(url).read.encode('utf-8', 'gbk', undef: :replace, invalid: :replace, replace: '?') unless cached
+			def self.read_url(url, cached = false, skip_encoding = false)
+				return sanitary_read(open(url), skip_encoding) unless cached
 
 				cache_dir = '/tmp/url_caches'
 
@@ -116,7 +137,13 @@ EOS
 
 				path = File.join(cache_dir, Digest::MD5.hexdigest(url))
 				File.write(path, open(url).read) unless File.exists?(path)
-				File.open(path).read.encode('utf-8', 'gbk', undef: :replace, invalid: :replace, replace: '?')
+				sanitary_read(File.open(path), skip_encoding)
+			end
+
+			def self.sanitary_read(file, skip_encoding = false)
+				skip_encoding ?
+					file.read :
+					file.read.encode('utf-8', 'gbk', undef: :replace, invalid: :replace, replace: '?')
 			end
 
 			def to_utf8(_string)
