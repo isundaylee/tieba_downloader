@@ -88,10 +88,14 @@ module TiebaDownloader
 					url = i['src']
 					url = URI::join(base, url).to_s unless url.start_with? 'http'
 
-					image = read_url(url, true, true)
-					string = 'data:image/png;base64,' + Base64.strict_encode64(image).strip
+					begin
+						image = read_url(url, true, true)
+						string = 'data:image/png;base64,' + Base64.strict_encode64(image).strip
 
-					i['src'] = string
+						i['src'] = string
+					rescue
+						puts "  图片嵌入失败"
+					end
 				end
 			end
 
