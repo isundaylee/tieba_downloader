@@ -20,8 +20,10 @@ module TiebaDownloader
 
 			puts "下载 #{id} 至 #{path}#{op_only ? '，只看楼主' : ''}"
 
-			doc = Nokogiri::HTML(read_url(page_url(id, 1, op_only), caching))
+      cached_doc = Nokogiri::HTML(read_url(page_url(id, 1, op_only), true)) if cached?(page_url(id, 1, op_only))
+			doc = Nokogiri::HTML(read_url(page_url(id, 1, op_only), false))
 
+      cached_pn = get_page_num(cached_doc) if cached_doc
 			pn = get_page_num(doc)
 
 			puts "共有 #{pn} 页"
@@ -31,7 +33,7 @@ module TiebaDownloader
 			1.upto(pn) do |p|
 				puts "正在下载页面 (%03d / %03d)" % [p, pn]
 				url = page_url(id, p, op_only)
-				doc = Nokogiri::HTML(read_url(url, caching)) unless p == 1
+				doc = Nokogiri::HTML(read_url(url, caching && (p != cached_pn))) unless p == 1
 
 				if p == 1
 					base_node = Nokogiri::XML::Node.new('base', out_doc)
@@ -133,16 +135,24 @@ EOS
 			end
 
 			def self.read_url(url, cached = false, skip_encoding = false)
-				return sanitary_read(open(url), skip_encoding) unless cached
-
 				cache_dir = '/tmp/url_caches'
 
 				FileUtils.mkdir_p(cache_dir)
 
 				path = File.join(cache_dir, Digest::MD5.hexdigest(url))
+        fresh = open(url).read unless (cached && File.exists?(path))
 				File.write(path, open(url).read) unless File.exists?(path)
-				sanitary_read(File.open(path), skip_encoding)
+
+				cached ?
+          sanitary_read(File.open(path), skip_encoding) :
+          fresh
 			end
+
+      def self.cached?(url)
+        cache_dir = '/tmp/url_caches'
+
+        File.exists?(File.join(cache_dir, Digest::MD5.hexdigest(url)))
+      end
 
 			def self.sanitary_read(file, skip_encoding = false)
 				skip_encoding ?
